@@ -3,25 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PreForth — Prefix Concatenative Language & WebAssembly Playground</title>
-  <meta name="description" content="Learn PreForth in Y Minutes: A prefix concatenative programming language with linear bytecode, O(1) goto jumps, C ABI FFI, and WebAssembly execution.">
+  <title>PreForth — Prefix Concatenative Language & WebAssembly Shell</title>
+  <meta name="description" content="PreForth is a prefix concatenative systems programming language with linear bytecode compilation, O(1) goto jumps, C ABI interoperability, and WebAssembly execution.">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: #121826;
-      --card-border: #1f293d;
-      --accent: #10b981;
-      --accent-hover: #059669;
-      --accent-dim: rgba(16, 185, 129, 0.15);
-      --cyan: #38bdf8;
-      --amber: #f59e0b;
-      --purple: #a855f7;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --code-bg: #0b0f19;
-      --editor-bg: #0b0f19;
-      --term-bg: #050811;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --primary: #234b70;
+      --primary-dark: #18334d;
+      --primary-light: #2d6291;
+      --accent: #ffd343;
+      --accent-hover: #f3c62d;
+      --accent-dark: #b89314;
+      --bg: #fdfdfd;
+      --bg-alt: #f4f6f9;
+      --card-bg: #ffffff;
+      --border: #dbe2ea;
+      --border-subtle: #edf2f7;
+      --text: #222b37;
+      --text-muted: #5e6d82;
+      --shell-bg: #14202e;
+      --shell-header: #1a293a;
+      --shell-border: #2c3e55;
+      --shell-text: #e6edf3;
+      --shell-muted: #8b9bb0;
+      --shell-cyan: #56c2f5;
+      --shell-green: #4ade80;
+      --shell-amber: #fbbf24;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: ui-monospace, "Cascadia Code", "Fira Code", Menlo, Monaco, Consolas, monospace;
     }
 
@@ -41,15 +48,17 @@
       flex-direction: column;
     }
 
-    /* Header */
+    /* Top Navigation Bar (Classic Python/Ruby style) */
     header {
-      background: rgba(18, 24, 38, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      padding: 0.75rem 1.5rem;
+      background: var(--primary-dark);
+      border-bottom: 2px solid var(--primary-light);
+      color: #ffffff;
+      padding: 0.75rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -62,54 +71,53 @@
       align-items: center;
       gap: 0.75rem;
       text-decoration: none;
-      color: var(--text);
+      color: #ffffff;
     }
 
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
+    .brand-badge {
+      background: var(--accent);
+      color: var(--primary-dark);
       font-family: var(--font-mono);
-      font-size: 1.1rem;
-      color: #050811;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      letter-spacing: -0.05em;
     }
 
     .brand-title {
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       letter-spacing: -0.02em;
+      color: #ffffff;
     }
 
-    .tag-pill {
-      font-size: 0.75rem;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 0.15rem 0.6rem;
-      border-radius: 9999px;
-      font-family: var(--font-mono);
-      font-weight: 600;
+    .brand-tagline {
+      font-size: 0.82rem;
+      color: #a4b8cc;
+      font-weight: 400;
+      margin-left: 0.25rem;
+      border-left: 1px solid #334e6b;
+      padding-left: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .brand-tagline { display: none; }
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
     .nav-links a {
-      color: var(--text-muted);
+      color: #d1dfed;
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 0.9rem;
       font-weight: 500;
-      transition: color 0.2s;
-      display: flex;
+      transition: color 0.15s ease;
+      display: inline-flex;
       align-items: center;
       gap: 0.35rem;
     }
@@ -118,525 +126,730 @@
       color: var(--accent);
     }
 
-    /* Main Container */
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: minmax(400px, 1fr) minmax(450px, 1.1fr);
-      max-width: 1600px;
-      margin: 0 auto;
-      width: 100%;
-      gap: 1.5rem;
-      padding: 1.5rem;
+    .nav-pill {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    @media (max-width: 1024px) {
-      main {
+    /* Hero Section (Python-style hero with embedded live shell) */
+    .hero {
+      background: linear-gradient(180deg, #18334d 0%, #204162 100%);
+      color: #ffffff;
+      padding: 3rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 992px) {
+      .hero-container {
         grid-template-columns: 1fr;
       }
     }
 
-    /* Tutorial Panel */
-    .tutorial-pane {
-      overflow-y: auto;
-      padding-right: 0.5rem;
+    .hero-text h1 {
+      font-size: 2.3rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
     }
 
-    .intro-banner {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(56, 189, 248, 0.05));
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 2rem;
+    .hero-text h1 span {
+      color: var(--accent);
     }
 
-    .intro-banner h1 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(to right, #ffffff, var(--cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .intro-banner p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.25rem;
+    .hero-text p {
+      font-size: 1.05rem;
+      color: #cfddec;
       margin-bottom: 1.5rem;
+      line-height: 1.6;
     }
 
-    .section h2 {
+    .hero-features {
+      list-style: none;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-features li {
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: #e2ecf6;
+    }
+
+    .hero-features li::before {
+      content: "✔";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--accent);
+      color: var(--primary-dark);
+      padding: 0.65rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-gold:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline-white {
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 0.65rem 1.3rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+    }
+
+    .btn-outline-white:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
+    }
+
+    /* Embedded Interactive Shell Widget (Python.org style) */
+    .shell-card {
+      background: var(--shell-bg);
+      border: 1px solid var(--shell-border);
+      border-radius: 6px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .shell-topbar {
+      background: var(--shell-header);
+      border-bottom: 1px solid var(--shell-border);
+      padding: 0.5rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .shell-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .shell-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .shell-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .shell-dot.red { background: #ef4444; }
+    .shell-dot.yellow { background: #f59e0b; }
+    .shell-dot.green { background: #10b981; }
+
+    .shell-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--shell-muted);
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
+
+    .shell-examples-select {
+      background: #111a24;
+      color: #e2ecf6;
+      border: 1px solid var(--shell-border);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .shell-examples-select:focus {
+      border-color: var(--shell-cyan);
+    }
+
+    .shell-editor-wrapper {
+      padding: 0.5rem;
+      background: var(--shell-bg);
+    }
+
+    .shell-editor {
+      width: 100%;
+      height: 170px;
+      background: #0d1520;
+      color: var(--shell-text);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      padding: 0.75rem;
+      border: 1px solid var(--shell-border);
+      border-radius: 4px;
+      resize: vertical;
+      outline: none;
+      tab-size: 4;
+    }
+
+    .shell-editor:focus {
+      border-color: var(--shell-cyan);
+    }
+
+    .shell-controls {
+      background: var(--shell-header);
+      border-top: 1px solid var(--shell-border);
+      border-bottom: 1px solid var(--shell-border);
+      padding: 0.4rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .shell-btn-group {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .shell-btn {
+      padding: 0.35rem 0.8rem;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.15s ease;
+    }
+
+    .shell-btn-run {
+      background: var(--accent);
+      color: var(--primary-dark);
+    }
+
+    .shell-btn-run:hover {
+      background: var(--accent-hover);
+    }
+
+    .shell-btn-sec {
+      background: #223245;
+      color: #cbd5e1;
+      border: 1px solid #334860;
+    }
+
+    .shell-btn-sec:hover {
+      background: #2b3e56;
+      color: #ffffff;
+    }
+
+    .shell-hint {
+      font-size: 0.72rem;
+      color: var(--shell-muted);
+      font-family: var(--font-mono);
+    }
+
+    .shell-output-wrapper {
+      padding: 0.5rem;
+      background: #090e15;
+    }
+
+    .shell-output {
+      height: 120px;
+      overflow-y: auto;
+      padding: 0.5rem 0.65rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #94a3b8;
+      white-space: pre-wrap;
+    }
+
+    .shell-output .ok-val {
+      color: var(--shell-green);
+      font-weight: 600;
+    }
+
+    .shell-output .err-val {
+      color: #f87171;
+      font-weight: 600;
+    }
+
+    .shell-stack-bar {
+      background: #111a24;
+      border-top: 1px solid var(--shell-border);
+      padding: 0.4rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+    }
+
+    .shell-stack-label {
+      color: var(--shell-amber);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .shell-stack-chips {
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    .shell-chip {
+      background: rgba(86, 194, 245, 0.15);
+      border: 1px solid rgba(86, 194, 245, 0.3);
+      color: var(--shell-cyan);
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+
+    .shell-chip.tos {
+      background: rgba(74, 222, 128, 0.15);
+      border-color: rgba(74, 222, 128, 0.4);
+      color: var(--shell-green);
+      font-weight: 700;
+    }
+
+    .shell-empty {
+      color: var(--shell-muted);
+      font-style: italic;
+    }
+
+    /* Pillars Section (Ruby & Python homepage 3-column summary) */
+    .pillars {
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+    }
+
+    .pillars-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 860px) {
+      .pillars-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pillar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem;
+    }
+
+    .pillar-card h3 {
       font-size: 1.15rem;
       font-weight: 700;
-      color: var(--cyan);
+      color: var(--primary);
       margin-bottom: 0.5rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .section p, .section ul {
+    .pillar-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Main Tutorial Section: Learn PreForth in Y Minutes */
+    .docs-section {
+      padding: 3rem 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border-subtle);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .doc-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .doc-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .doc-item h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .doc-item p {
       font-size: 0.9rem;
       color: var(--text-muted);
       margin-bottom: 0.75rem;
     }
 
-    .section ul {
-      padding-left: 1.25rem;
-    }
-
-    .section li {
-      margin-bottom: 0.25rem;
-    }
-
-    .code-box {
-      position: relative;
-      background: var(--code-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 0.85rem 1rem;
-      margin: 0.75rem 0;
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      overflow-x: auto;
-      color: #e2e8f0;
-      white-space: pre;
-    }
-
-    .code-box-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .run-btn-inline {
-      background: var(--accent-dim);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: var(--accent);
-      padding: 0.25rem 0.65rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      font-family: var(--font-mono);
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .run-btn-inline:hover {
-      background: var(--accent);
-      color: #050811;
-      transform: translateY(-1px);
-    }
-
-    /* REPL Panel */
-    .repl-pane {
-      position: sticky;
-      top: 5rem;
-      height: calc(100vh - 6.5rem);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    @media (max-width: 1024px) {
-      .repl-pane {
-        position: static;
-        height: auto;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    }
-
-    .repl-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.85rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .wasm-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      color: var(--accent);
-      background: rgba(16, 185, 129, 0.1);
-      padding: 0.2rem 0.6rem;
-      border-radius: 9999px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .wasm-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-    }
-
-    .examples-select {
-      background: var(--code-bg);
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 0.3rem 0.75rem;
-      font-size: 0.8rem;
-      font-family: var(--font-sans);
-      outline: none;
-      cursor: pointer;
-    }
-
-    .examples-select:focus {
-      border-color: var(--cyan);
-    }
-
-    .editor-wrapper {
-      position: relative;
-      flex: 1;
-      min-height: 220px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .editor-area {
-      flex: 1;
-      width: 100%;
-      background: var(--editor-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      color: #f8fafc;
-      font-family: var(--font-mono);
-      font-size: 0.9rem;
-      padding: 0.85rem;
-      resize: vertical;
-      outline: none;
-      line-height: 1.5;
-      white-space: pre;
-      tab-size: 4;
-      transition: border-color 0.2s;
-    }
-
-    .editor-area:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-dim);
-    }
-
-    .controls-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 0.75rem 0;
-      gap: 0.5rem;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn {
-      padding: 0.45rem 1rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      font-family: var(--font-sans);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: all 0.2s;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #050811;
-      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      border: 1px solid var(--card-border);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #475569;
-    }
-
-    .hotkey-hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    /* Output Console */
-    .console-card {
-      background: var(--term-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 160px;
-      max-height: 240px;
+    .doc-code-block {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-top: auto;
       overflow: hidden;
     }
 
-    .console-header {
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid var(--card-border);
-      padding: 0.4rem 0.85rem;
+    .doc-code-header {
+      background: #edf2f7;
+      border-bottom: 1px solid var(--border);
+      padding: 0.3rem 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 0.75rem;
-      font-family: var(--font-mono);
       color: var(--text-muted);
-    }
-
-    .console-output {
-      padding: 0.75rem 0.85rem;
-      overflow-y: auto;
       font-family: var(--font-mono);
-      font-size: 0.85rem;
-      line-height: 1.45;
-      color: #cbd5e1;
-      flex: 1;
-      white-space: pre-wrap;
     }
 
-    .console-output .ok-tag {
-      color: var(--accent);
+    .btn-run-snippet {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1px solid #cbd5e1;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      font-size: 0.72rem;
       font-weight: 600;
-    }
-
-    .console-output .err-tag {
-      color: #ef4444;
-      font-weight: 600;
-    }
-
-    /* Stack Viewer Bar */
-    .stack-bar {
-      margin-top: 0.75rem;
-      background: var(--code-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 0.5rem 0.85rem;
-      display: flex;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
-      font-size: 0.8rem;
+      gap: 0.25rem;
+    }
+
+    .btn-run-snippet:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .doc-code-content {
+      padding: 0.75rem;
       font-family: var(--font-mono);
-    }
-
-    .stack-label {
-      color: var(--amber);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .stack-chips {
-      display: flex;
-      gap: 0.4rem;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      flex: 1;
-    }
-
-    .stack-chip {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: var(--cyan);
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      white-space: nowrap;
-    }
-
-    .stack-chip.tos {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .stack-empty {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--card-border);
-      padding: 1.25rem 2rem;
       font-size: 0.85rem;
-      color: var(--text-muted);
-      text-align: center;
-      background: rgba(18, 24, 38, 0.5);
+      color: #1e293b;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.5;
     }
 
-    footer a {
+    /* Footer (Minimalist & Classic) */
+    footer {
+      background: #f1f5f9;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer-links a:hover {
       text-decoration: underline;
-      transition: color 0.2s;
     }
-
-    footer a:hover {
-      color: var(--accent);
-    }
-
-    .keyword { color: #f43f5e; font-weight: 600; }
-    .fn { color: #38bdf8; font-weight: 600; }
-    .num { color: #fbbf24; }
-    .str { color: #34d399; }
-    .comment { color: #64748b; font-style: italic; }
   </style>
 </head>
 <body>
 
+  <!-- Minimalist Top Navigation -->
   <header>
-    <a href="#" class="brand">
-      <div class="brand-logo">PF</div>
-      <div class="brand-title">PreForth</div>
-      <span class="tag-pill">v0.1 WASM</span>
-    </a>
-    <div class="nav-links">
-      <a href="https://github.com/xyzzyapps/preforth" target="_blank" rel="noopener">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <span class="brand-badge">PF</span>
+        <span class="brand-title">PreForth</span>
+        <span class="brand-tagline">Prefix Concatenative Language</span>
       </a>
-      <a href="https://github.com/xyzzyapps/preforth/releases/tag/v0.1" target="_blank" rel="noopener">
-        Releases
-      </a>
-      <a href="https://github.com/xyzzyapps/preforth/blob/main/LEARN.md" target="_blank" rel="noopener">
-        LEARN.md
-      </a>
+      <nav class="nav-links">
+        <a href="#shell" onclick="document.getElementById('shell').scrollIntoView({behavior:'smooth'}); return false;">Interactive Shell</a>
+        <a href="#learn" onclick="document.getElementById('learn').scrollIntoView({behavior:'smooth'}); return false;">Tutorial</a>
+        <a href="https://github.com/xyzzyapps/preforth/blob/main/LEARN.md" target="_blank" rel="noopener">LEARN.md</a>
+        <a href="https://github.com/xyzzyapps/preforth/releases/tag/v0.1" target="_blank" rel="noopener" class="nav-pill">Release v0.1</a>
+        <a href="https://github.com/xyzzyapps/preforth" target="_blank" rel="noopener">GitHub</a>
+      </nav>
     </div>
   </header>
 
-  <main>
-    <!-- LEFT PANEL: Learn PreForth in Y Minutes Tutorial -->
-    <div class="tutorial-pane">
-      <div class="intro-banner">
-        <h1>Learn PreForth in Y Minutes</h1>
-        <p>PreForth is a prefix concatenative systems language. You write natural prefix expressions like <code style="color:var(--cyan)">+ 2 3</code>, which compile down to linear postfix bytecode for $O(1)$ <code style="color:var(--accent)">goto</code> jumps and zero-overhead C ABI interoperability.</p>
-      </div>
-
-      <!-- Section 1 -->
-      <div class="section">
-        <h2>1. The Golden Rule of Prefix Evaluation</h2>
-        <p>PreForth code executes top-to-bottom. Within each statement, tokens are compiled in <strong>reverse order (right-to-left)</strong> so prefix expressions turn into linear execution instructions.</p>
-        <p>In <code style="color:var(--cyan)">+ 2 3</code>, the number 3 is pushed first, 2 is pushed second, and <code style="color:var(--accent)">+</code> pops 2 and 3 and adds them to produce 5.</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Basic prefix arithmetic</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
-          </div>
-<code>+ 2 3
-- 10 * 2 3
-/ 20 + 2 3</code>
+  <!-- Hero Banner with Embedded Interactive Shell -->
+  <section class="hero" id="shell">
+    <div class="hero-container">
+      <div class="hero-text">
+        <h1>Write <span>Prefix</span> Expressions.<br>Run <span>Linear</span> Postfix Bytecode.</h1>
+        <p>PreForth is a prefix concatenative language combining the natural readability of prefix math with the raw power of stack-based bytecode, zero-overhead <code>goto</code> control flow, and seamless bidirectional C ABI interop.</p>
+        <ul class="hero-features">
+          <li><strong>Prefix Notation:</strong> Write natural prefix expressions like <code>+ 2 3</code> or <code>- 10 * 2 3</code>.</li>
+          <li><strong>$O(1)$ Goto Jumps:</strong> State machine loops execute in constant stack depth.</li>
+          <li><strong>Zero-Overhead C ABI:</strong> Import/export symbols, build shared libraries, or compile to WebAssembly.</li>
+          <li><strong>PolyForm Noncommercial:</strong> Free for education, personal experiments, and open research.</li>
+        </ul>
+        <div class="hero-cta">
+          <button class="btn-gold" onclick="runCode()">▶ Run in Shell</button>
+          <a href="https://github.com/xyzzyapps/preforth/releases/tag/v0.1" class="btn-outline-white" target="_blank" rel="noopener">Download Binaries (v0.1)</a>
         </div>
       </div>
 
-      <!-- Section 2 -->
-      <div class="section">
-        <h2>2. Non-Commutative Binary Operations</h2>
-        <p>Because prefix statements are reversed, binary operators pop <code style="color:var(--cyan)">lhs = pop()</code> first and <code style="color:var(--cyan)">rhs = pop()</code> second:</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># lhs - rhs and lhs / rhs</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- Embedded Shell / Playground -->
+      <div class="shell-card">
+        <div class="shell-topbar">
+          <div class="shell-title-group">
+            <div class="shell-dots">
+              <span class="shell-dot red"></span>
+              <span class="shell-dot yellow"></span>
+              <span class="shell-dot green"></span>
+            </div>
+            <span class="shell-title">PreForth WASM Interactive Shell</span>
           </div>
-<code>- 10 3     # lhs=10, rhs=3 -> 7
+          <select id="example-select" class="shell-examples-select" onchange="onSelectExample(this.value)">
+            <option value="prefix">Select Example: Prefix Math</option>
+            <option value="fact">Select Example: Recursive Factorial</option>
+            <option value="collatz">Select Example: Collatz Goto Loop</option>
+            <option value="fib">Select Example: Fibonacci Generator</option>
+            <option value="vars">Select Example: Variables & Memory</option>
+            <option value="cube">Select Example: Square & Cube</option>
+          </select>
+        </div>
+
+        <div class="shell-editor-wrapper">
+          <textarea id="code-editor" class="shell-editor" spellcheck="false" placeholder="Enter PreForth expressions..."># Non-commutative prefix arithmetic
+- 10 * 2 3
+/ 20 + 2 3
++ 100 23</textarea>
+        </div>
+
+        <div class="shell-controls">
+          <div class="shell-btn-group">
+            <button id="run-btn" class="shell-btn shell-btn-run" onclick="runCode()">
+              <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+              Run Code
+            </button>
+            <button class="shell-btn shell-btn-sec" onclick="resetVM()">Reset VM</button>
+            <button class="shell-btn shell-btn-sec" onclick="clearConsole()">Clear</button>
+          </div>
+          <span class="shell-hint" id="wasm-status">Loading WebAssembly...</span>
+        </div>
+
+        <div class="shell-output-wrapper">
+          <div id="console-output" class="shell-output">PreForth VM ready. Type code above or click "Run Code" (Ctrl+Enter).</div>
+        </div>
+
+        <div class="shell-stack-bar">
+          <span class="shell-stack-label">Data Stack:</span>
+          <div id="stack-chips" class="shell-stack-chips">
+            <span class="shell-empty">(empty)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Pillar Highlights (Python/Ruby homepage style) -->
+  <section class="pillars">
+    <div class="pillars-container">
+      <div class="pillar-card">
+        <h3>Prefix Concatenative</h3>
+        <p>PreForth eliminates the mental hurdle of reverse polish notation (RPN). Write <code>+ 1 2</code> naturally. The statement chunker reverses tokens right-to-left, compiling directly into linear postfix instructions.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>$O(1)$ Goto Jumps</h3>
+        <p>Build blazing-fast state machines with zero call-stack overhead. Unconditional and conditional jumps (<code>goto</code>, <code>?goto</code>, <code>?!goto</code>) compile to integer index jumps without recursion depth buildup.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>Bidirectional C ABI</h3>
+        <p>Call external C libraries, export PreForth words as C ABI symbols, and produce native shared libraries (<code>.so</code>, <code>.dll</code>, <code>.dylib</code>) or compile to WebAssembly with zero glue code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Tutorial Section: Learn PreForth in Y Minutes -->
+  <main class="docs-section" id="learn">
+    <div class="section-header">
+      <h2>Learn PreForth in Y Minutes</h2>
+      <p>A concise, hands-on walkthrough of PreForth language mechanics. Click <strong>"Try in Shell ↑"</strong> on any snippet to test it live.</p>
+    </div>
+
+    <div class="doc-grid">
+      <!-- 1. The Golden Rule -->
+      <div class="doc-item">
+        <h3>1. The Golden Rule of Prefix Evaluation</h3>
+        <p>Statements execute top-to-bottom. Within each statement, tokens are compiled in reverse order (right-to-left). In <code>+ 2 3</code>, 3 is pushed first, 2 is pushed second, and <code>+</code> pops 2 and 3 to produce 5.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Prefix Arithmetic</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
+          </div>
+          <div class="doc-code-content">+ 2 3
+- 10 * 2 3
+/ 20 + 2 3</div>
+        </div>
+      </div>
+
+      <!-- 2. Non-Commutative Binary Operations -->
+      <div class="doc-item">
+        <h3>2. Non-Commutative Binary Operations</h3>
+        <p>Because statements are reversed, binary operators pop <code>lhs = pop()</code> first and <code>rhs = pop()</code> second. Mathematical order is fully preserved for subtraction, division, and comparisons.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>lhs - rhs and comparisons</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
+          </div>
+          <div class="doc-code-content">- 10 3     # lhs=10, rhs=3 -> 7
 / 20 4     # lhs=20, rhs=4 -> 5
 % 17 5     # 2
 < 3 5      # 1 (true)
-> 10 20    # 0 (false)</code>
+> 10 20    # 0 (false)</div>
         </div>
       </div>
 
-      <!-- Section 3 -->
-      <div class="section">
-        <h2>3. Stack Primitives</h2>
-        <p>PreForth provides standard Forth 64-bit data stack primitives:</p>
-        <ul>
-          <li><code>dup</code> : ( a -- a a ) Duplicate Top-of-Stack</li>
-          <li><code>drop</code> : ( a -- ) Discard Top-of-Stack</li>
-          <li><code>swap</code> : ( b a -- a b ) Swap top two cells</li>
-          <li><code>over</code> : ( a b -- a b a ) Copy 2nd element to top</li>
-        </ul>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Stack manipulation & squaring</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- 3. Stack Primitives -->
+      <div class="doc-item">
+        <h3>3. Dual Stack Manipulation</h3>
+        <p>PreForth provides standard 64-bit Forth stack operations: <code>dup</code> (duplicate TOS), <code>drop</code> (discard TOS), <code>swap</code> (swap top two), and <code>over</code> (copy 2nd element to top).</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Stack Primitives</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-<code># Push 42, duplicate, then multiply
+          <div class="doc-code-content"># Push 42, duplicate, then multiply
 dup 42
-*</code>
+*</div>
         </div>
       </div>
 
-      <!-- Section 4 -->
-      <div class="section">
-        <h2>4. Defining Words & Recursion</h2>
-        <p>Use <code style="color:var(--purple)">def &lt;name&gt; ... ;</code> to compile words into reusable bytecode blocks. Definitions support recursion naturally:</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Recursive factorial</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- 4. Defining Words & Recursion -->
+      <div class="doc-item">
+        <h3>4. Defining Words & Recursion</h3>
+        <p>Use <code>def &lt;name&gt; ... ;</code> to compile statements into reusable bytecode blocks. Recursive calls invoke the enclosing word naturally.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Factorial Word</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-<code>def fact
+          <div class="doc-code-content">def fact
   if == dup 0 then
     1 drop
   else
     * fact dec dup
   end ;
 
-fact 5</code>
+fact 5</div>
         </div>
       </div>
 
-      <!-- Section 5 -->
-      <div class="section">
-        <h2>5. Goto State Machines & Labels</h2>
-        <p>PreForth features zero-overhead, $O(1)$ bytecode jumps using labels, <code style="color:var(--accent)">goto</code>, <code style="color:var(--accent)">?goto</code>, and <code style="color:var(--accent)">?!goto</code>.</p>
-        <p>Here is the Collatz Conjecture state machine running in $O(1)$ constant call stack space:</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Collatz 3n+1 loop</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- 5. Goto State Machines -->
+      <div class="doc-item">
+        <h3>5. Goto State Machines & Labels</h3>
+        <p>PreForth supports $O(1)$ linear jumps via <code>goto</code>, <code>?goto</code> (conditional if true), and <code>?!goto</code> (conditional if false). Ideal for state machines that require constant call stack space.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Collatz 3n+1 Loop</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-<code>var n
+          <div class="doc-code-content">var n
 var steps
 def collatz
   ! steps 0
@@ -653,100 +866,73 @@ is_even:
 done:
   @ steps ;
 
-collatz 27</code>
+collatz 27</div>
         </div>
       </div>
 
-      <!-- Section 6 -->
-      <div class="section">
-        <h2>6. Variables & Memory Slots</h2>
-        <p>Declare global 64-bit dictionary variables with <code style="color:var(--purple)">var &lt;name&gt;</code>. Store with <code style="color:var(--cyan)">! &lt;var&gt; &lt;val&gt;</code> and fetch with <code style="color:var(--cyan)">@ &lt;var&gt;</code>:</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Variables and update</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- 6. Variables & Memory -->
+      <div class="doc-item">
+        <h3>6. Dictionary Variables & Stores</h3>
+        <p>Declare global 64-bit variables with <code>var &lt;name&gt;</code>. Fetch values using <code>@ &lt;var&gt;</code> and store new values using <code>! &lt;var&gt; &lt;val&gt;</code>.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Variables & Memory</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-<code>var counter
+          <div class="doc-code-content">var counter
 ! counter 100
 ! counter + @ counter 50
-@ counter</code>
+@ counter</div>
         </div>
       </div>
 
-      <!-- Section 7 -->
-      <div class="section">
-        <h2>7. Printing & C Strings</h2>
-        <p>Use <code style="color:var(--accent)">.</code> or <code style="color:var(--accent)">print</code> to print values and strings:</p>
-        <div class="code-box">
-          <div class="code-box-header">
-            <span class="comment"># Print outputs</span>
-            <button class="run-btn-inline" onclick="loadSnippet(this)">▶ Try in REPL</button>
+      <!-- 7. Output & C Strings -->
+      <div class="doc-item">
+        <h3>7. Printing & Strings</h3>
+        <p>Use <code>print</code> or <code>.</code> (dot) to pop and display the top of the stack. String literals support standard C escape sequences (<code>\n</code>, <code>\t</code>, <code>\"</code>).</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>Printing</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-<code>print "Welcome to WebAssembly PreForth!"
+          <div class="doc-code-content">print "Hello from PreForth!"
 . 42
-. * 7 9</code>
+. * 7 9</div>
         </div>
       </div>
 
-    </div>
-
-    <!-- RIGHT PANEL: Live WebAssembly Playground -->
-    <div class="repl-pane">
-      <div class="card">
-        <div class="repl-toolbar">
-          <div class="wasm-badge">
-            <span class="wasm-dot"></span>
-            <span id="wasm-status">Loading WASM...</span>
+      <!-- 8. C ABI Interoperability -->
+      <div class="doc-item">
+        <h3>8. C ABI Interoperability & AOT</h3>
+        <p>Dynamically bind external libraries with <code>extern</code>, or compile directly to Position-Independent C99 code and native <code>.so</code> / <code>.dll</code> shared libraries with <code>export</code> and <code>build-shared</code>.</p>
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>C Export & Linker Directives</span>
+            <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
-          <select id="example-select" class="examples-select" onchange="onSelectExample(this.value)">
-            <option value="prefix">Example: Prefix Arithmetic</option>
-            <option value="fact">Example: Recursive Factorial</option>
-            <option value="collatz">Example: Collatz State Machine</option>
-            <option value="fib">Example: Iterative Fibonacci</option>
-            <option value="vars">Example: Variables & Memory</option>
-            <option value="cube">Example: Square & Cube</option>
-          </select>
-        </div>
+          <div class="doc-code-content"># Export hyp_sq as a real C ABI symbol:
+# int64_t pf_hyp_sq(int64_t a, int64_t b)
+def hyp_sq
+  + * dup swap * dup ;
 
-        <div class="editor-wrapper">
-          <textarea id="code-editor" class="editor-area" spellcheck="false" placeholder="Type PreForth code here..."># Non-commutative prefix arithmetic
-- 10 * 2 3
-/ 20 + 2 3
-+ 100 23</textarea>
-        </div>
-
-        <div class="controls-row">
-          <div class="btn-group">
-            <button id="run-btn" class="btn btn-primary" onclick="runCode()">
-              <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
-              Run
-            </button>
-            <button class="btn btn-secondary" onclick="resetVM()">⟳ Reset VM</button>
-            <button class="btn btn-secondary" onclick="clearConsole()">✕ Clear</button>
-          </div>
-          <span class="hotkey-hint">Ctrl + Enter to run</span>
-        </div>
-
-        <div class="console-card">
-          <div class="console-header">
-            <span>TERMINAL OUTPUT</span>
-            <span id="exec-time"></span>
-          </div>
-          <div id="console-output" class="console-output">PreForth VM ready. Click Run or press Ctrl+Enter to execute.</div>
-        </div>
-
-        <div class="stack-bar">
-          <span class="stack-label">Data Stack:</span>
-          <div id="stack-chips" class="stack-chips">
-            <span class="stack-empty">(empty)</span>
-          </div>
+hyp_sq 3 4</div>
         </div>
       </div>
     </div>
   </main>
 
+  <!-- Minimalist Footer -->
   <footer>
-    <p>PreForth is released under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank">PolyForm Noncommercial License 1.0.0</a>. Created by <a href="https://github.com/xyzzyapps" target="_blank">Xyzzy Apps</a>.</p>
+    <div class="footer-container">
+      <div>
+        <strong>PreForth</strong> &copy; 2026 Xyzzy Apps. Released under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank" rel="noopener">PolyForm Noncommercial License 1.0.0</a>.
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/xyzzyapps/preforth" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/xyzzyapps/preforth/releases/tag/v0.1" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/xyzzyapps/preforth/blob/main/LEARN.md" target="_blank" rel="noopener">Learn in Y Minutes</a>
+      </div>
+    </div>
   </footer>
 
   <script src="preforth.js"></script>
@@ -829,41 +1015,37 @@ cube 3`
     const editor = document.getElementById('code-editor');
     const consoleOutput = document.getElementById('console-output');
     const wasmStatus = document.getElementById('wasm-status');
-    const execTime = document.getElementById('exec-time');
     const stackChips = document.getElementById('stack-chips');
 
     async function initVM() {
       try {
         vm = new PreForthVM();
         await vm.init('preforth.wasm');
-        wasmStatus.textContent = 'WebAssembly Ready (wasm32-wasi)';
+        wasmStatus.textContent = 'WASM Ready (wasm32-wasi)';
+        wasmStatus.style.color = '#4ade80';
       } catch (err) {
         console.error(err);
         wasmStatus.textContent = 'WASM Failed to Load';
-        wasmStatus.style.color = '#ef4444';
-        consoleOutput.innerHTML = `<span class="err-tag">Initialization Error:</span> ${err.message}`;
+        wasmStatus.style.color = '#f87171';
+        consoleOutput.innerHTML = `<span class="err-val">Initialization Error: ${escapeHtml(err.message)}</span>`;
       }
     }
 
     function runCode() {
       if (!vm) return;
       const code = editor.value;
-      const t0 = performance.now();
       try {
         const result = vm.eval(code);
-        const t1 = performance.now();
-        execTime.textContent = `${(t1 - t0).toFixed(2)} ms`;
-
         let formatted = escapeHtml(result);
         if (formatted.includes('Error:')) {
-          formatted = `<span class="err-tag">${formatted}</span>`;
+          formatted = `<span class="err-val">${formatted}</span>`;
         } else {
-          formatted = `<span class="ok-tag">${formatted}</span>`;
+          formatted = `<span class="ok-val">${formatted}</span>`;
         }
-        consoleOutput.innerHTML = formatted || '<span class="ok-tag">ok</span>';
+        consoleOutput.innerHTML = formatted || '<span class="ok-val">ok</span>';
         updateStackDisplay(result);
       } catch (e) {
-        consoleOutput.innerHTML = `<span class="err-tag">Runtime Error: ${escapeHtml(e.message)}</span>`;
+        consoleOutput.innerHTML = `<span class="err-val">Runtime Error: ${escapeHtml(e.message)}</span>`;
       }
     }
 
@@ -874,13 +1056,13 @@ cube 3`
         const tokens = match[1].trim().split(/\s+/);
         tokens.forEach((val, idx) => {
           const chip = document.createElement('span');
-          chip.className = 'stack-chip' + (idx === tokens.length - 1 ? ' tos' : '');
+          chip.className = 'shell-chip' + (idx === tokens.length - 1 ? ' tos' : '');
           chip.textContent = (idx === tokens.length - 1 ? 'TOS: ' : '') + val;
           stackChips.appendChild(chip);
         });
       } else {
         const empty = document.createElement('span');
-        empty.className = 'stack-empty';
+        empty.className = 'shell-empty';
         empty.textContent = '(empty)';
         stackChips.appendChild(empty);
       }
@@ -889,14 +1071,12 @@ cube 3`
     function resetVM() {
       if (!vm) return;
       vm.reset();
-      consoleOutput.innerHTML = '<span class="ok-tag">VM reset. Stack and dictionary cleared.</span>';
-      execTime.textContent = '';
+      consoleOutput.innerHTML = '<span class="ok-val">VM reset. Stack and variables cleared.</span>';
       updateStackDisplay('');
     }
 
     function clearConsole() {
       consoleOutput.textContent = '';
-      execTime.textContent = '';
     }
 
     function onSelectExample(key) {
@@ -907,14 +1087,12 @@ cube 3`
     }
 
     function loadSnippet(btn) {
-      const codeBox = btn.closest('.code-box');
-      const codeEl = codeBox.querySelector('code');
-      if (codeEl) {
-        editor.value = codeEl.textContent.trim();
+      const codeBlock = btn.closest('.doc-code-block');
+      const content = codeBlock.querySelector('.doc-code-content');
+      if (content) {
+        editor.value = content.textContent.trim();
+        document.getElementById('shell').scrollIntoView({ behavior: 'smooth' });
         runCode();
-        if (window.innerWidth <= 1024) {
-          editor.scrollIntoView({ behavior: 'smooth' });
-        }
       }
     }
 
@@ -924,7 +1102,7 @@ cube 3`
                 .replace(/>/g, '&gt;');
     }
 
-    // Tab key support & Ctrl+Enter in editor
+    // Ctrl+Enter or Cmd+Enter to run, Tab key inserts 2 spaces
     editor.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();

@@ -30,6 +30,20 @@ if ($All) {
     Write-Host "Cross-compiling for aarch64-macos..." -ForegroundColor Cyan
     zig cc -target aarch64-macos-none -Wno-deprecated-declarations $INCS $SRCS -o dist/preforth-aarch64-macos
 
+    Write-Host "Compiling for WebAssembly (wasm32-wasi)..." -ForegroundColor Cyan
+    $WASM_SRCS = @("src/wasm_bridge.c", "src/lexer.c", "src/compiler.c", "src/vm.c", "src/ffi.c", "src/aot.c")
+    zig cc -target wasm32-wasi -O3 -fno-sanitize=all -DPREFORTH_WASM=1 -mexec-model=reactor `
+        "-Wl,--export=preforth_wasm_init" `
+        "-Wl,--export=preforth_wasm_eval" `
+        "-Wl,--export=preforth_wasm_reset" `
+        "-Wl,--export=preforth_wasm_stack_depth" `
+        "-Wl,--export=malloc" `
+        "-Wl,--export=free" `
+        -o dist/preforth.wasm $WASM_SRCS
+    if (Test-Path "docs") {
+        Copy-Item dist/preforth.wasm docs/preforth.wasm -Force
+    }
+
     Write-Host "`nAll platform binaries compiled successfully in dist/:" -ForegroundColor Green
     Get-ChildItem dist
 } else {

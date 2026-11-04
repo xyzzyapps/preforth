@@ -161,6 +161,8 @@ void ffi_cleanup(VM *vm) {
         if (vm->libs[i]) {
 #if defined(PREFORTH_WINDOWS)
             FreeLibrary((HMODULE)vm->libs[i]);
+#elif defined(PREFORTH_WASM)
+            /* no-op on wasm */
 #else
             dlclose(vm->libs[i]);
 #endif
@@ -200,6 +202,8 @@ bool ffi_load_library(VM *vm, const char *handle, const char *lib_name) {
     } else {
         lib_ptr = (void *)LoadLibraryA(lib_name);
     }
+#elif defined(PREFORTH_WASM)
+    lib_ptr = (void *)1;
 #else
     if (strcmp(lib_name, "libc") == 0 || strcmp(lib_name, "libm") == 0) {
         lib_ptr = dlopen(NULL, RTLD_LAZY | RTLD_GLOBAL);
@@ -242,6 +246,8 @@ void *ffi_find_symbol(VM *vm, const char *lib_handle, const char *symbol_name) {
     if (lib_ptr) {
 #if defined(PREFORTH_WINDOWS)
         sym = (void *)GetProcAddress((HMODULE)lib_ptr, symbol_name);
+#elif defined(PREFORTH_WASM)
+        sym = NULL;
 #else
         sym = dlsym(lib_ptr, symbol_name);
 #endif
@@ -252,6 +258,8 @@ void *ffi_find_symbol(VM *vm, const char *lib_handle, const char *symbol_name) {
         HMODULE h_main = GetModuleHandleA(NULL);
         if (h_main) sym = (void *)GetProcAddress(h_main, symbol_name);
     }
+#elif defined(PREFORTH_WASM)
+    /* on wasm, symbols come from builtin_symbols */
 #else
     if (!sym) {
         sym = dlsym(RTLD_DEFAULT, symbol_name);

@@ -389,6 +389,11 @@ bool aot_build_shared(VM *vm, const char *out_filename) {
         strncat(cmd, vm->link_libs[i], sizeof(cmd) - strlen(cmd) - 1);
     }
 
+#if defined(PREFORTH_WASM)
+    remove(temp_c);
+    vm_error(vm, "Cannot invoke system toolchain from WebAssembly target");
+    return false;
+#else
     int ret = system(cmd);
     remove(temp_c);
 
@@ -398,6 +403,7 @@ bool aot_build_shared(VM *vm, const char *out_filename) {
     }
 
     return true;
+#endif
 }
 
 bool aot_build_object(VM *vm, const char *out_filename) {
@@ -411,6 +417,11 @@ bool aot_build_object(VM *vm, const char *out_filename) {
     char cmd[2048];
     snprintf(cmd, sizeof(cmd), "zig cc -c -fPIC -O2 -Wno-absolute-value -Wno-deprecated-declarations \"%s\" -o \"%s\"", temp_c, out_filename);
 
+#if defined(PREFORTH_WASM)
+    remove(temp_c);
+    vm_error(vm, "Cannot invoke system toolchain from WebAssembly target");
+    return false;
+#else
     int ret = system(cmd);
     remove(temp_c);
 
@@ -420,4 +431,5 @@ bool aot_build_object(VM *vm, const char *out_filename) {
     }
 
     return true;
+#endif
 }

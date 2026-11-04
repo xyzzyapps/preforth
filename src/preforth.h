@@ -12,6 +12,8 @@
 #if defined(_WIN32) || defined(_WIN64)
 #define PREFORTH_WINDOWS 1
 #include <windows.h>
+#elif defined(__wasi__) || defined(__EMSCRIPTEN__) || defined(__wasm__)
+#define PREFORTH_WASM 1
 #else
 #define PREFORTH_POSIX 1
 #include <dlfcn.h>
@@ -282,6 +284,10 @@ typedef struct VM {
     int max_call_depth;
     int current_call_depth;
     FILE *out_stream;
+
+    char *custom_output_buf;
+    size_t custom_output_cap;
+    size_t custom_output_len;
 } VM;
 
 /* Lexer functions */

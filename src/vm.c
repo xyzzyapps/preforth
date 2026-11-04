@@ -79,7 +79,17 @@ void vm_error(VM *vm, const char *fmt, ...) {
     vsnprintf(vm->error_msg, sizeof(vm->error_msg), fmt, args);
     va_end(args);
     vm->has_error = true;
-    fprintf(stderr, "PreForth Error: %s\n", vm->error_msg);
+    if (vm->custom_output_buf) {
+        char err_tmp[1100];
+        snprintf(err_tmp, sizeof(err_tmp), "PreForth Error: %s\n", vm->error_msg);
+        size_t elen = strlen(err_tmp);
+        if (vm->custom_output_len + elen + 1 < vm->custom_output_cap) {
+            memcpy(vm->custom_output_buf + vm->custom_output_len, err_tmp, elen + 1);
+            vm->custom_output_len += elen;
+        }
+    } else {
+        fprintf(stderr, "PreForth Error: %s\n", vm->error_msg);
+    }
 }
 
 void vm_push(VM *vm, Value v) {
@@ -690,21 +700,31 @@ void vm_execute_block(VM *vm, BytecodeBlock *block) {
 
             case OP_PRINT: {
                 Value v = vm_pop(vm);
+                char tmp[512];
                 switch (v.type) {
                     case VAL_INT:
-                        fprintf(vm->out_stream, "%lld\n", (long long)v.as.i);
+                        snprintf(tmp, sizeof(tmp), "%lld\n", (long long)v.as.i);
                         break;
                     case VAL_FLOAT:
-                        fprintf(vm->out_stream, "%g\n", v.as.f);
+                        snprintf(tmp, sizeof(tmp), "%g\n", v.as.f);
                         break;
                     case VAL_STR:
-                        fprintf(vm->out_stream, "%s\n", v.as.str);
+                        snprintf(tmp, sizeof(tmp), "%s\n", v.as.str);
                         break;
                     case VAL_PTR:
-                        fprintf(vm->out_stream, "%p\n", v.as.ptr);
+                        snprintf(tmp, sizeof(tmp), "%p\n", v.as.ptr);
                         break;
                 }
-                fflush(vm->out_stream);
+                if (vm->custom_output_buf) {
+                    size_t tlen = strlen(tmp);
+                    if (vm->custom_output_len + tlen + 1 < vm->custom_output_cap) {
+                        memcpy(vm->custom_output_buf + vm->custom_output_len, tmp, tlen + 1);
+                        vm->custom_output_len += tlen;
+                    }
+                } else {
+                    fputs(tmp, vm->out_stream);
+                    fflush(vm->out_stream);
+                }
                 ip++;
                 break;
             }

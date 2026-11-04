@@ -6,6 +6,15 @@ In PreForth, expressions within a statement are written in **prefix notation** (
 
 ---
 
+## Quick Links
+
+- 🌐 **Live WebAssembly Playground**: [xyzzyapps.github.io/preforth](https://xyzzyapps.github.io/preforth/)
+- 📖 **Tutorial (Learn X in Y Minutes)**: [LEARN.md](LEARN.md)
+- 📦 **Download Pre-Built Binaries (v0.1)**: [GitHub Releases](https://github.com/xyzzyapps/preforth/releases/tag/v0.1)
+- 📜 **License**: [PolyForm Noncommercial License 1.0.0](LICENSE)
+
+---
+
 ## Key Architectural Principles
 
 1. **Prefix Notation to Linear Bytecode**: Statements are parsed top-to-bottom, and within each statement, tokens are reversed right-to-left so prefix expressions compile directly into postfix bytecode.
@@ -135,6 +144,19 @@ Builds binaries into `dist/`:
 - **Linux aarch64 (musl)**: `dist/preforth-aarch64-linux`
 - **macOS x86_64**: `dist/preforth-x86_64-macos`
 - **macOS aarch64**: `dist/preforth-aarch64-macos`
+- **WebAssembly (WASI)**: `dist/preforth.wasm`
+
+### WebAssembly Compilation
+
+```bash
+zig cc -target wasm32-wasi -O3 -fno-sanitize=all -DPREFORTH_WASM=1 -mexec-model=reactor \
+  -Wl,--export=preforth_wasm_init \
+  -Wl,--export=preforth_wasm_eval \
+  -Wl,--export=preforth_wasm_reset \
+  -Wl,--export=preforth_wasm_stack_depth \
+  -Wl,--export=malloc -Wl,--export=free \
+  -o dist/preforth.wasm src/wasm_bridge.c src/lexer.c src/compiler.c src/vm.c src/ffi.c src/aot.c
+```
 
 ---
 

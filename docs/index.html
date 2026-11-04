@@ -852,16 +852,16 @@ fact 5</div>
           <div class="doc-code-content">var n
 var steps
 def collatz
-  ! steps 0
-  ! n
+  set steps 0
+  set n
 loop:
   ?goto done == @ n 1
-  ! steps inc @ steps
+  set steps inc @ steps
   ?goto is_even == % @ n 2 0
-  ! n + * 3 @ n 1
+  set n + * 3 @ n 1
   goto loop
 is_even:
-  ! n / @ n 2
+  set n / @ n 2
   goto loop
 done:
   @ steps ;
@@ -873,15 +873,15 @@ collatz 27</div>
       <!-- 6. Variables & Memory -->
       <div class="doc-item">
         <h3>6. Dictionary Variables & Stores</h3>
-        <p>Declare global 64-bit variables with <code>var &lt;name&gt;</code>. Fetch values using <code>@ &lt;var&gt;</code> and store new values using <code>! &lt;var&gt; &lt;val&gt;</code>.</p>
+        <p>Declare global 64-bit variables with <code>var &lt;name&gt;</code>. Fetch values using <code>@ &lt;var&gt;</code> and store new values using <code>set &lt;var&gt; &lt;val&gt;</code>.</p>
         <div class="doc-code-block">
           <div class="doc-code-header">
             <span>Variables & Memory</span>
             <button class="btn-run-snippet" onclick="loadSnippet(this)">Try in Shell ↑</button>
           </div>
           <div class="doc-code-content">var counter
-! counter 100
-! counter + @ counter 50
+set counter 100
+set counter + @ counter 50
 @ counter</div>
         </div>
       </div>
@@ -958,16 +958,16 @@ fact 6`,
 var n
 var steps
 def collatz
-  ! steps 0
-  ! n
+  set steps 0
+  set n
 loop:
   ?goto done == @ n 1
-  ! steps inc @ steps
+  set steps inc @ steps
   ?goto is_even == % @ n 2 0
-  ! n + * 3 @ n 1
+  set n + * 3 @ n 1
   goto loop
 is_even:
-  ! n / @ n 2
+  set n / @ n 2
   goto loop
 done:
   @ steps ;
@@ -980,15 +980,15 @@ var fa
 var fb
 var ftmp
 def fib
-  ! fn
-  ! fa 0
-  ! fb 1
+  set fn
+  set fa 0
+  set fb 1
 floop:
   ?goto fdone == @ fn 0
-  ! ftmp @ fb
-  ! fb + @ fa @ fb
-  ! fa @ ftmp
-  ! fn dec @ fn
+  set ftmp @ fb
+  set fb + @ fa @ fb
+  set fa @ ftmp
+  set fn dec @ fn
   goto floop
 fdone:
   @ fa ;
@@ -998,9 +998,9 @@ fib 10`,
       vars: `# Global 64-bit variables & stores
 var balance
 var tax
-! balance 1000
-! tax 80
-! balance - @ balance @ tax
+set balance 1000
+set tax 80
+set balance - @ balance @ tax
 @ balance`,
 
       cube: `# Square & Cube Words

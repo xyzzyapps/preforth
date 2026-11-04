@@ -55,7 +55,7 @@ In PreForth, expressions within a statement are written in **prefix notation** (
 - **Variables**: `var <name>` allocates an 8-byte slot initialized to 0; referencing `<name>` pushes its address.
 - **Fetch & Store**:
   - `@ <var>`: fetches 64-bit value at address.
-  - `! <var> <val>`: stores `<val>` into `<var>` (pops `<var>` first, `<val>` second).
+  - `set <var> <val>`: stores `<val>` into `<var>` (pops `<var>` first, `<val>` second; `!` supported as alias).
 - **Raw Memory Words**:
   - Fetch: `c@8`, `c@32`, `c@64`
   - Store: `c!8`, `c!32`, `c!64`

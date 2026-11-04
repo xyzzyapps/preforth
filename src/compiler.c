@@ -180,7 +180,7 @@ static void compile_single_token(VM *vm, BytecodeBlock *bb, const Token *tok) {
         else if (strcmp(t, "r>") == 0) emit_op(bb, OP_FROM_R);
         else if (strcmp(t, ".") == 0 || strcmp(t, "print") == 0) emit_op(bb, OP_PRINT);
         else if (strcmp(t, "@") == 0) emit_op(bb, OP_FETCH);
-        else if (strcmp(t, "!") == 0) emit_op(bb, OP_STORE);
+        else if (strcmp(t, "set") == 0 || strcmp(t, "!") == 0) emit_op(bb, OP_STORE);
         else if (strcmp(t, "c@8") == 0) emit_op(bb, OP_C_FETCH8);
         else if (strcmp(t, "c@32") == 0) emit_op(bb, OP_C_FETCH32);
         else if (strcmp(t, "c@64") == 0) emit_op(bb, OP_C_FETCH64);

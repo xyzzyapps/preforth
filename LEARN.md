@@ -118,17 +118,17 @@ r>          # Move Top of Return Stack to Data Stack: ( -- a ) (R: a -- )
 var counter
 var total
 
-# '!' stores a value into a variable: ! <var> <val>
+# 'set' stores a value into a variable: set <var> <val>
 # Pops <var> first, then pops <val> second.
-! counter 10
-! total 100
+set counter 10
+set total 100
 
 # '@' fetches the value from a variable address: @ <var>
 @ counter   # Pushes 10 onto stack
 @ total     # Pushes 100 onto stack
 
 # Incrementing a variable in prefix style:
-! counter + @ counter 1    # counter is now 11
+set counter + @ counter 1    # counter is now 11
 
 
 # -----------------------------------------------------------------------------
@@ -184,19 +184,19 @@ var collatz_n
 var collatz_steps_count
 
 def collatz_steps
-  ! collatz_steps_count 0
-  ! collatz_n
+  set collatz_steps_count 0
+  set collatz_n
 step_loop:
   ?goto done == @ collatz_n 1
-  ! collatz_steps_count inc @ collatz_steps_count
+  set collatz_steps_count inc @ collatz_steps_count
 
   # Jump if even
   ?goto is_even == % @ collatz_n 2 0
-  ! collatz_n + * 3 @ collatz_n 1
+  set collatz_n + * 3 @ collatz_n 1
   goto step_loop
 
 is_even:
-  ! collatz_n / @ collatz_n 2
+  set collatz_n / @ collatz_n 2
   goto step_loop
 
 done:
@@ -242,7 +242,7 @@ signum 0    # 0
 
 # 'cstr <str_literal>' creates a null-terminated char buffer in memory:
 var msg
-! msg cstr "Hello C Memory"
+set msg cstr "Hello C Memory"
 c@8 @ msg   # Pushes ASCII value of 'H' (72)
 
 

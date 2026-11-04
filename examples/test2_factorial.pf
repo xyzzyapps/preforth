@@ -1,0 +1,7 @@
+# Test 2: Recursive Word Definition
+# def fact if == dup 0 then + 1 drop else * fact dec dup end ;
+# followed by . fact 5 -> 120
+
+def fact if == dup 0 then + 1 drop else * fact dec dup end ;
+
+. fact 5

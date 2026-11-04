@@ -1,0 +1,17 @@
+# Test 4: Variadic C ABI & Heap Memory
+# Bind malloc, free, and snprintf from libc. Allocate a 128-byte buffer,
+# format "Val: %d" via snprintf, convert back with cstr, verify output is "Val: 42", and free the buffer.
+
+extern libc ptr malloc ( u64 )
+extern libc void free ( ptr )
+extern libc i32 snprintf ( ptr u64 str ... )
+
+var buf
+! buf malloc 128
+
+# Call variadic snprintf: buf, 128, "Val: %d", 1 (var count), 42 (var arg)
+snprintf @ buf 128 "Val: %d" 1 42
+drop
+
+. cstr @ buf
+free @ buf

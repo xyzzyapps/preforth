@@ -1,0 +1,19 @@
+# Binaries in root
+preforth
+preforth.exe
+*.pdb
+*.ilk
+*.exp
+*.obj
+*.o
+
+# Temporary AOT files
+_pf_aot_*
+
+# Zig build artifacts
+zig-cache/
+.zig-cache/
+zig-out/
+
+# Built binaries folder (released via gh release assets)
+dist/

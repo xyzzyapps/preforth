@@ -1,0 +1,6 @@
+# Test 1: Non-Commutative Prefix Arithmetic
+# . - 10 * 2 3 -> 10 - (2 * 3) = 4
+. - 10 * 2 3
+
+# . / 20 + 2 3 -> 20 / (2 + 3) = 4
+. / 20 + 2 3

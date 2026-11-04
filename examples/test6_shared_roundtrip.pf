@@ -1,0 +1,23 @@
+# Test 6: Ahead-of-Time (AOT) Shared Library Generation & Linker Integration
+# 1. Imports libc's 'abs'
+# 2. Defines recursive 'fact'
+# 3. Defines 'pf_factorial' using 'fact' and 'abs'
+# 4. Exports 'pf_factorial' with a standard C ABI prologue and epilogue
+# 5. Links against libc (-lc)
+# 6. Compiles a native shared library (.so / .dylib / .dll) via zig cc -shared -fPIC
+
+import i64 abs ( i64 )
+
+def fact
+  if == dup 0 then
+    + 1 drop
+  else
+    * fact dec dup
+  end ;
+
+def pf_factorial
+  fact abs ;
+
+export i64 pf_factorial as "pf_factorial" ( i64 )
+link-lib "c"
+build-shared "dist/libtest.dll"

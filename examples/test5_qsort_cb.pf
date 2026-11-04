@@ -1,0 +1,31 @@
+# Test 5: C Callback Interop with qsort
+# Allocate a 4-element int32_t array [40, 10, 30, 20] in raw memory,
+# pass a PreForth comparator def cmp_i32 - c@32 swap c@32 ;
+# via cb i32 cmp_i32 ( ptr ptr ) to libc's qsort,
+# and verify the memory reads back as [10, 20, 30, 40].
+
+extern libc ptr malloc ( u64 )
+extern libc void free ( ptr )
+extern libc void qsort ( ptr u64 u64 ptr )
+
+def cmp_i32 - c@32 swap c@32 ;
+
+var arr
+! arr malloc 16
+
+c!32 + @ arr 0 40
+c!32 + @ arr 4 10
+c!32 + @ arr 8 30
+c!32 + @ arr 12 20
+
+var cmp_cb
+! cmp_cb cb i32 cmp_i32 ( ptr ptr )
+
+qsort @ arr 4 4 @ cmp_cb
+
+. c@32 + @ arr 0
+. c@32 + @ arr 4
+. c@32 + @ arr 8
+. c@32 + @ arr 12
+
+free @ arr

@@ -1,0 +1,23 @@
+# Test 3: Forward & Backward goto State Machine
+# collatz_steps 27 implemented using label:, goto, and ?goto outputs 111 without growing the call stack.
+
+var n
+var steps
+
+def collatz_steps
+    ! steps 0
+    ! n
+loop:
+    ?goto done == @ n 1
+    ! steps inc @ steps
+    ?goto is_even == % @ n 2 0
+    ! n + * 3 @ n 1
+    goto loop
+is_even:
+    ! n / @ n 2
+    goto loop
+done:
+    @ steps
+;
+
+. collatz_steps 27

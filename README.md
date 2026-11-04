@@ -1,6 +1,6 @@
 # PreForth
 
-PreForth is a prefix concatenative programming language featuring linear bytecode compilation, $O(1)$ goto control flow, and a zero-overhead bidirectional C ABI FFI bridge.
+PreForth is a prefix concatenative programming language featuring linear bytecode compilation, O(1) goto control flow, and a zero-overhead bidirectional C ABI FFI bridge.
 
 In PreForth, expressions within a statement are written in **prefix notation** (`+ 2 3`) rather than postfix (`2 3 +`), statements execute top-to-bottom, and prefix expressions compile down to linear postfix bytecode for efficient execution and seamless C interoperability.
 
@@ -19,7 +19,7 @@ In PreForth, expressions within a statement are written in **prefix notation** (
 
 1. **Prefix Notation to Linear Bytecode**: Statements are parsed top-to-bottom, and within each statement, tokens are reversed right-to-left so prefix expressions compile directly into postfix bytecode.
 2. **Crucial Binary Evaluation Rule**: Because prefix expressions `op a b` evaluate right-to-left into bytecode `b a op`, `a` is on top of the stack (TOS) when `op` executes. Therefore, all binary operators pop `lhs = pop()` first and `rhs = pop()` second, ensuring non-commutative operations like `-`, `/`, and comparisons preserve mathematical order.
-3. **Control Flow & $O(1)$ Jumps**: Both structured control flow (`if ... then ... else ... end`) and jump directives (`goto`, `?goto`, `?!goto`) compile into linear bytecode with anonymous offsets and label backpatching.
+3. **Control Flow & O(1) Jumps**: Both structured control flow (`if ... then ... else ... end`) and jump directives (`goto`, `?goto`, `?!goto`) compile into linear bytecode with anonymous offsets and label backpatching.
 4. **Bidirectional C ABI Bridge**: Zero-overhead foreign function interface with support for dynamic library loading (`lib`), C function bindings (`extern`), variadics (`...`), and native C callbacks (`cb`).
 
 ---

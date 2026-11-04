@@ -5,7 +5,7 @@ contributors:
 filename: learnpreforth.pf
 ---
 
-PreForth is a prefix concatenative systems programming language. While traditional Forth uses postfix notation (`2 3 +`), PreForth lets you write expressions naturally in prefix notation (`+ 2 3`) while compiling down into linear postfix bytecode for $O(1)$ `goto` state-machine jumps, a dual data/return stack, and zero-overhead bidirectional C ABI interoperability.
+PreForth is a prefix concatenative systems programming language. While traditional Forth uses postfix notation (`2 3 +`), PreForth lets you write expressions naturally in prefix notation (`+ 2 3`) while compiling down into linear postfix bytecode for O(1) `goto` state-machine jumps, a dual data/return stack, and zero-overhead bidirectional C ABI interoperability.
 
 PreForth code executes top-to-bottom, line-by-line. Within each statement, tokens are compiled in reverse (right-to-left), converting prefix operators into linear postfix execution instructions.
 

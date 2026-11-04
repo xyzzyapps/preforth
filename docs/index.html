@@ -683,7 +683,7 @@
         <p>PreForth is a prefix concatenative language combining the natural readability of prefix math with the raw power of stack-based bytecode, zero-overhead <code>goto</code> control flow, and seamless bidirectional C ABI interop.</p>
         <ul class="hero-features">
           <li><strong>Prefix Notation:</strong> Write natural prefix expressions like <code>+ 2 3</code> or <code>- 10 * 2 3</code>.</li>
-          <li><strong>$O(1)$ Goto Jumps:</strong> State machine loops execute in constant stack depth.</li>
+          <li><strong>O(1) Goto Jumps:</strong> State machine loops execute in constant stack depth.</li>
           <li><strong>Zero-Overhead C ABI:</strong> Import/export symbols, build shared libraries, or compile to WebAssembly.</li>
           <li><strong>PolyForm Noncommercial:</strong> Free for education, personal experiments, and open research.</li>
         </ul>
@@ -755,7 +755,7 @@
         <p>PreForth eliminates the mental hurdle of reverse polish notation (RPN). Write <code>+ 1 2</code> naturally. The statement chunker reverses tokens right-to-left, compiling directly into linear postfix instructions.</p>
       </div>
       <div class="pillar-card">
-        <h3>$O(1)$ Goto Jumps</h3>
+        <h3>O(1) Goto Jumps</h3>
         <p>Build blazing-fast state machines with zero call-stack overhead. Unconditional and conditional jumps (<code>goto</code>, <code>?goto</code>, <code>?!goto</code>) compile to integer index jumps without recursion depth buildup.</p>
       </div>
       <div class="pillar-card">
@@ -843,7 +843,7 @@ fact 5</div>
       <!-- 5. Goto State Machines -->
       <div class="doc-item">
         <h3>5. Goto State Machines & Labels</h3>
-        <p>PreForth supports $O(1)$ linear jumps via <code>goto</code>, <code>?goto</code> (conditional if true), and <code>?!goto</code> (conditional if false). Ideal for state machines that require constant call stack space.</p>
+        <p>PreForth supports O(1) linear jumps via <code>goto</code>, <code>?goto</code> (conditional if true), and <code>?!goto</code> (conditional if false). Ideal for state machines that require constant call stack space.</p>
         <div class="doc-code-block">
           <div class="doc-code-header">
             <span>Collatz 3n+1 Loop</span>
